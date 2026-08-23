@@ -601,6 +601,342 @@ export class PromptDjMidi extends LitElement {
     .btn-deck-load-mini:hover {
       background: rgba(255, 255, 255, 0.2);
     }
+
+    /* 2026 interface pass: one clear navigation hierarchy, quiet surfaces, and
+       secondary tools available on demand instead of competing with the mixer. */
+    :host {
+      padding: 0 20px 68px;
+      background: #080a0f;
+    }
+
+    #background {
+      background:
+        radial-gradient(circle at 15% -10%, rgba(42, 246, 222, 0.09), transparent 34%),
+        radial-gradient(circle at 90% 0%, rgba(255, 37, 246, 0.07), transparent 28%),
+        linear-gradient(180deg, #0b0d13 0%, #07080c 100%);
+    }
+
+    #top-nav-container {
+      top: 10px;
+      max-width: 1400px;
+      margin: 10px auto 22px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      background: rgba(12, 14, 20, 0.92);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .app-bar {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-height: 48px;
+    }
+
+    .brand-pill {
+      padding: 7px 10px;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      flex-shrink: 0;
+    }
+
+    .brand-pill:hover {
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .brand-logo-text {
+      font-size: 1.2rem;
+    }
+
+    .brand-link-tag {
+      background: rgba(42, 246, 222, 0.12);
+      color: #2af6de;
+    }
+
+    .primary-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .primary-nav .tab-btn {
+      min-height: 38px;
+      padding: 8px 13px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.64);
+      font-size: 0.8rem;
+    }
+
+    .primary-nav .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+    }
+
+    .primary-nav .tab-btn.active {
+      background: rgba(42, 246, 222, 0.1);
+      border-color: rgba(42, 246, 222, 0.4);
+      color: #eafffc;
+      box-shadow: none;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .mobile-label {
+      display: none;
+    }
+
+    .book-primary {
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 14px;
+      min-height: 38px;
+      background: #ffb703;
+      color: #161006;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .book-primary:hover {
+      background: #ffc733;
+    }
+
+    details.menu {
+      position: relative;
+    }
+
+    details.menu > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    details.menu > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu-trigger {
+      min-height: 38px;
+      padding: 8px 11px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.76);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    details[open] .menu-trigger,
+    .menu-trigger:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.24);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .menu-popover {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      z-index: 80;
+      min-width: 250px;
+      padding: 8px;
+      display: grid;
+      gap: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      background: rgba(16, 18, 25, 0.98);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+    }
+
+    .menu-action {
+      width: 100%;
+      min-height: 39px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.78);
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 750;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .menu-action:hover,
+    .menu-action.active {
+      color: #fff;
+      background: rgba(42, 246, 222, 0.08);
+    }
+
+    .menu-divider {
+      height: 1px;
+      margin: 4px 3px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .menu-status {
+      padding: 7px 10px;
+      color: rgba(255, 255, 255, 0.52);
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .profile-btn {
+      min-height: 38px;
+      padding: 6px 9px;
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: none;
+    }
+
+    @media (max-width: 980px) {
+      :host {
+        padding-inline: 10px;
+      }
+
+      #top-nav-container {
+        top: 6px;
+        margin-top: 6px;
+      }
+
+      .app-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .primary-nav {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+        scrollbar-width: none;
+      }
+
+      .nav-actions {
+        margin-left: auto;
+      }
+    }
+
+    @media (max-width: 620px) {
+      :host {
+        padding-bottom: 120px;
+      }
+
+      #top-nav-container {
+        backdrop-filter: none;
+      }
+
+      .brand-by,
+      .brand-link-tag,
+      .profile-btn span,
+      .book-primary .book-long {
+        display: none;
+      }
+
+      .app-bar {
+        gap: 5px;
+      }
+
+      .brand-pill {
+        padding-inline: 4px;
+      }
+
+      .nav-actions {
+        gap: 4px;
+      }
+
+      .book-primary {
+        padding-inline: 11px;
+      }
+
+      .menu-popover {
+        position: fixed;
+        top: 72px;
+        left: 10px;
+        right: 10px;
+        min-width: 0;
+      }
+
+      .primary-nav .tab-btn {
+        min-width: 0;
+        min-height: 44px;
+        padding: 6px 3px;
+        justify-content: center;
+        font-size: 0.69rem;
+      }
+
+      .primary-nav .desktop-label {
+        display: none;
+      }
+
+      .primary-nav .mobile-label {
+        display: inline;
+      }
+
+      .primary-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        width: auto;
+        height: 58px;
+        padding: 6px 8px;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 2px;
+        overflow: visible;
+        border-top: 1px solid rgba(255, 255, 255, 0.11);
+        background: rgba(12, 14, 20, 0.97);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.42);
+      }
+
+      .primary-nav .menu,
+      .primary-nav .menu-trigger {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      .primary-nav .menu-trigger {
+        min-height: 44px;
+        justify-content: center;
+        padding: 6px 3px;
+        font-size: 0.69rem;
+        border-color: transparent;
+        background: transparent;
+      }
+
+      .primary-nav .menu-popover {
+        top: auto;
+        bottom: 66px;
+        left: 10px;
+        right: 10px;
+      }
+    }
   `;
 
   private prompts: Map<string, Prompt>;
@@ -926,194 +1262,130 @@ export class PromptDjMidi extends LitElement {
     return html`
       <div id="background" style=${bg}></div>
 
-      <!-- Top Header Navigation & Branding with Live Link to idpro.com -->
+      <!-- Compact app shell: primary journeys first, specialist controls on demand. -->
       <div id="top-nav-container">
-        <!-- Row 1: Brand, User Profile, Global Tools, MIDI Dropdown -->
-        <div class="nav-main-row">
-          <!-- Left: Brand & Live Link -->
-          <div class="nav-group">
-            <a
-              href="https://idpro.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="brand-pill"
-              title="Visit idpro.com • Official Digital Pro Site (also idpropro.com)"
-            >
-              <span class="brand-logo-text">iDj.pro</span>
-              <span class="brand-by">by idpro.com</span>
-              <span class="brand-link-tag">LIVE ↗</span>
-            </a>
-          </div>
+        <div class="app-bar">
+          <a
+            href="https://idpro.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="brand-pill"
+            title="Visit idpro.com"
+          >
+            <span class="brand-logo-text">iDj.pro</span>
+            <span class="brand-by">by idpro.com</span>
+            <span class="brand-link-tag">LIVE</span>
+          </a>
 
-          <!-- Right: Actions, History, Decals, DJ Lessons, Profile & MIDI -->
-          <div class="nav-group">
-            <!-- Learn to DJ with DJ LOCKJAH Button -->
+          <nav class="primary-nav" aria-label="Primary">
             <button
-              class="btn-lessons-pill"
-              @click=${() => (this.isDjLessonsModalOpen = true)}
-              title="Private Personal DJ Lessons Direct to You by DJ LOCKJAH (2025 Colorado DJ of the Year)"
+              class="tab-btn ${this.activeView === 'virtual_decks' ? 'active' : ''}"
+              @click=${() => this.setView('virtual_decks')}
             >
-              <span>🏆 Learn to DJ</span>
-              <span class="badge-gold">LJ SCHEDULE</span>
+              <span class="desktop-label">🎚️ Mix</span><span class="mobile-label">🎚️ Mix</span>
+            </button>
+            <button
+              class="tab-btn ${this.activeView === 'audio_sources' ? 'active' : ''}"
+              @click=${() => this.setView('audio_sources')}
+            >
+              <span class="desktop-label">♫ Music</span><span class="mobile-label">♫ Music</span>
+            </button>
+            <button
+              class="tab-btn ${this.activeView === 'multitrack_mixer' ? 'active' : ''}"
+              @click=${() => this.setView('multitrack_mixer')}
+            >
+              <span class="desktop-label">▦ 5-Track Studio</span><span class="mobile-label">▦ Studio</span>
+            </button>
+            <button
+              class="tab-btn ${this.activeView === 'dj_lessons' ? 'active' : ''}"
+              @click=${() => this.setView('dj_lessons')}
+            >
+              <span class="desktop-label">🎓 Lessons</span><span class="mobile-label">🎓 Learn</span>
             </button>
 
-            <!-- History & Share Modal Trigger -->
-            <button
-              class="action-icon-btn"
-              @click=${() => (this.isHistoryModalOpen = true)}
-              title="Track History, Setlists & Session Share"
-            >
-              <span>📜 Setlist & Share</span>
+            <details class="menu">
+              <summary class="menu-trigger">More <span aria-hidden="true">⌄</span></summary>
+              <div class="menu-popover">
+                <button
+                  class="menu-action ${this.activeView === 'stems_ai' ? 'active' : ''}"
+                  @click=${() => this.setView('stems_ai')}
+                >
+                  <span>◫</span><span>Stems & AI Engine</span>
+                </button>
+                <button
+                  class="menu-action ${this.activeView === 'ai_prompts' ? 'active' : ''}"
+                  @click=${() => this.setView('ai_prompts')}
+                >
+                  <span>⚡</span><span>AI Generative Deck</span>
+                </button>
+                <button
+                  class="menu-action ${this.activeView === 'video_karaoke' ? 'active' : ''}"
+                  @click=${() => this.setView('video_karaoke')}
+                >
+                  <span>▣</span><span>Video & Karaoke</span>
+                </button>
+                <button
+                  class="menu-action ${this.activeView === 'hardware_hub' ? 'active' : ''}"
+                  @click=${() => this.setView('hardware_hub')}
+                >
+                  <span>⌁</span><span>Hardware & MIDI</span>
+                </button>
+              </div>
+            </details>
+          </nav>
+
+          <div class="nav-actions">
+            <button class="book-primary" @click=${() => (this.isDjLessonsModalOpen = true)}>
+              <span>Book</span><span class="book-long"> a lesson · $50</span>
             </button>
 
-            <!-- Custom Decals Studio Trigger -->
-            <button
-              class="action-icon-btn"
-              @click=${() => {
-                this.decalTargetDeck = 'A';
-                this.isDecalModalOpen = true;
-              }}
-              title="Upload and manage custom vinyl decals and slipmats"
-            >
-              <span>🎨 Art Decals</span>
-            </button>
+            <details class="menu">
+              <summary class="menu-trigger" aria-label="Open tools">Tools <span aria-hidden="true">⌄</span></summary>
+              <div class="menu-popover">
+                <button class="menu-action" @click=${() => (this.isDriveModalOpen = true)}>
+                  <span>☁</span><span>Drive crate</span>
+                </button>
+                <button class="menu-action" @click=${() => (this.isHistoryModalOpen = true)}>
+                  <span>☷</span><span>Setlist & history</span>
+                </button>
+                <button
+                  class="menu-action"
+                  @click=${() => {
+                    this.decalTargetDeck = 'A';
+                    this.isDecalModalOpen = true;
+                  }}
+                >
+                  <span>◉</span><span>Deck artwork</span>
+                </button>
+                <button class="menu-action" @click=${() => (this.isLatencyModalOpen = true)}>
+                  <span>⏱</span><span>Latency calibration · ${this.latencyOffsetMs >= 0 ? `+${this.latencyOffsetMs}` : this.latencyOffsetMs}ms</span>
+                </button>
+                <button class="menu-action" @click=${() => this.manualSaveSessionCheckpoint()}>
+                  <span>↓</span><span>Save checkpoint</span>
+                </button>
+                <button class="menu-action" @click=${() => this.runManualGcOrReset()}>
+                  <span>${this.audioHealth?.state === 'suspended' ? '⚠' : '●'}</span>
+                  <span>${this.audioHealth?.state === 'suspended' ? 'Resume audio engine' : 'Audio engine ready'}</span>
+                </button>
+                <div class="menu-divider"></div>
+                <div class="menu-status">MIDI CONTROLLER</div>
+                <midi-device-dropdown
+                  .midiDispatcher=${this.midiDispatcher}
+                  @error-message=${(e: CustomEvent<string>) =>
+                    this.dispatchEvent(new CustomEvent('error', { detail: e.detail }))}
+                ></midi-device-dropdown>
+              </div>
+            </details>
 
-            <!-- Google Drive Cloud Crate Trigger -->
-            <button
-              class="btn-drive-pill"
-              @click=${() => (this.isDriveModalOpen = true)}
-              title="Google Drive Cloud Music Crate & Track Management"
-            >
-              <svg style="width: 14px; height: 14px;" viewBox="0 0 87.3 78">
-                <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
-                <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
-                <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
-                <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
-                <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
-                <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
-              </svg>
-              <span>Drive Crate</span>
-            </button>
-
-            <!-- User Profile & Google Login Trigger -->
             <button
               class="profile-btn"
               @click=${() => (this.isProfileModalOpen = true)}
-              title="Account & Profile Creation (Google Login or Guest)"
+              title="Account and profile"
             >
-              <img src="${p?.avatarUrl}" alt="${p?.djAlias}" class="user-avatar-mini" />
+              <img src="${p?.avatarUrl}" alt="" class="user-avatar-mini" />
               <span>${p?.djAlias || 'Guest DJ'}</span>
             </button>
-
-            <!-- Audio Engine Health & Memory GC Badge -->
-            <button
-              class="audio-health-badge ${this.audioHealth?.dspMode === 'audioworklet' ? 'worklet' : ''} ${this.audioHealth?.state === 'suspended' ? 'suspended' : ''}"
-              @click=${() => this.runManualGcOrReset()}
-              title="DSP Engine: ${this.audioHealth?.dspMode === 'audioworklet' ? 'AudioWorklet Low Latency Thread' : 'Web Audio'}. Pooled Memory: ${((this.audioHealth?.bufferPoolMetrics?.totalPooledMemoryBytes || 0) / 1024).toFixed(0)} KB. Click to run memory garbage collection or reset audio."
-            >
-              <span>${this.audioHealth?.state === 'suspended' ? '⚠️ Audio Paused' : this.audioHealth?.dspMode === 'audioworklet' ? '⚡ Worklet DSP' : '🎛️ Audio Ready'}</span>
-              ${this.audioHealth?.bufferPoolMetrics
-                ? html`<span style="font-size: 0.625rem; opacity: 0.8; font-family: 'JetBrains Mono', monospace;">• ${((this.audioHealth.bufferPoolMetrics.totalPooledMemoryBytes || 0) / 1024).toFixed(0)}KB</span>`
-                : ''}
-            </button>
-
-            <!-- Latency Calibration Trigger Button -->
-            <button
-              class="btn-top-util"
-              @click=${() => (this.isLatencyModalOpen = true)}
-              title="Calibrate Audio-to-MIDI roundtrip buffer latency and hardware jitter"
-            >
-              <span>⏱️ Sync ${this.latencyOffsetMs >= 0 ? `+${this.latencyOffsetMs}` : this.latencyOffsetMs}ms</span>
-            </button>
-
-            <!-- Session Checkpoint Save / Clear -->
-            <button
-              class="btn-top-util"
-              @click=${() => this.manualSaveSessionCheckpoint()}
-              title="Save active DJ session checkpoint (restores loaded tracks, loops, stems, and EQ)"
-            >
-              <span>💾 Checkpoint</span>
-            </button>
-
-            <!-- Dedicated MIDI Device Dropdown -->
-            <midi-device-dropdown
-              .midiDispatcher=${this.midiDispatcher}
-              @error-message=${(e: CustomEvent<string>) =>
-                this.dispatchEvent(new CustomEvent('error', { detail: e.detail }))}
-            ></midi-device-dropdown>
           </div>
-        </div>
-
-        <!-- Row 2: Responsive Horizontal Tools & Suite Selector -->
-        <div class="view-switcher-bar">
-          <button
-            class="tab-btn ${this.activeView === 'virtual_decks' ? 'active' : ''}"
-            @click=${() => this.setView('virtual_decks')}
-            title="Pioneer OPUS-QUAD 4-Channel Standalone System with Multi-Room Zone Output & AI Generative Deck"
-          >
-            <span>🎚️ Virtual Decks & AI Deck</span>
-          </button>
-
-          <button
-            class="tab-btn ${this.activeView === 'dj_lessons' ? 'active' : ''}"
-            @click=${() => this.setView('dj_lessons')}
-            title="Learn to DJ: Private Personal DJ Lessons Direct to You by DJ LOCKJAH (2025 Colorado DJ of the Year)"
-          >
-            <span>🎓 Learn to DJ</span>
-            <span class="badge-gold">DJ LOCKJAH • $50 DEP</span>
-          </button>
-
-          <button
-            class="tab-btn ${this.activeView === 'stems_ai' ? 'active' : ''}"
-            @click=${() => this.setView('stems_ai')}
-            title="Real-Time 4-Way Stem Separation (Vocals, Drums, Bass, Melody) & AI Performance Suite"
-          >
-            <span>🎤 Stems & AI Engine</span>
-            <span class="badge-pink">NEURAL</span>
-          </button>
-
-          <button
-            class="tab-btn ${this.activeView === 'video_karaoke' ? 'active' : ''}"
-            @click=${() => this.setView('video_karaoke')}
-            title="Synchronized Video Decks, Shaders, Master Video Crossfader & Live CDG Karaoke"
-          >
-            <span>🎬 Video & Karaoke</span>
-            <span class="badge-cyan">60 FPS</span>
-          </button>
-
-          <button
-            class="tab-btn ${this.activeView === 'audio_sources' ? 'active' : ''}"
-            @click=${() => this.setView('audio_sources')}
-            title="Beatport, Spotify, Apple Music, Mixcloud & Audio Hijack Ingest"
-          >
-            <span>📻 Audio Sources & Beatport</span>
-          </button>
-
-          <button
-            class="tab-btn ${this.activeView === 'multitrack_mixer' ? 'active' : ''}"
-            @click=${() => this.setView('multitrack_mixer')}
-            title="5-Track Studio Mixer with iDproi.com Mixdown"
-          >
-            <span>🎛️ 5-Track Mixer</span>
-            <span class="badge-pink">iDproi.com</span>
-          </button>
-
-          <button
-            class="tab-btn ${this.activeView === 'hardware_hub' ? 'active' : ''}"
-            @click=${() => this.setView('hardware_hub')}
-            title="Extensive Hardware Controller Presets & Interactive MIDI Learn"
-          >
-            <span>🔌 Hardware Hub</span>
-            <span class="badge-orange">PRESETS</span>
-          </button>
-
-          <button
-            class="tab-btn ${this.activeView === 'ai_prompts' ? 'active' : ''}"
-            @click=${() => this.setView('ai_prompts')}
-            title="AI Prompt DJ Generative Live Deck"
-          >
-            <span>⚡ AI Generative Deck</span>
-          </button>
         </div>
       </div>
 
@@ -1330,4 +1602,3 @@ export class PromptDjMidi extends LitElement {
     });
   }
 }
-

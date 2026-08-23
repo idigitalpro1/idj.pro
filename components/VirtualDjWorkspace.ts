@@ -206,9 +206,13 @@ export class VirtualDjWorkspace extends LitElement {
     /* Pioneer OPUS-QUAD Flagship Standalone Stage */
     .opus-quad-stage {
       display: grid;
-      grid-template-columns: 1.15fr 1.3fr 1.15fr;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.3fr) minmax(0, 1.05fr);
       gap: 14px;
       align-items: start;
+    }
+
+    .opus-quad-stage > * {
+      min-width: 0;
     }
 
     @media (max-width: 1180px) {
@@ -233,6 +237,97 @@ export class VirtualDjWorkspace extends LitElement {
     @media (max-width: 900px) {
       .quad-grid-stage {
         grid-template-columns: 1fr;
+      }
+    }
+
+    :host {
+      padding: 0 0 24px;
+    }
+
+    .system-header-bar {
+      padding: 9px 12px;
+      margin-bottom: 10px;
+      border-color: rgba(255, 255, 255, 0.08);
+      border-radius: 11px;
+      background: rgba(16, 18, 25, 0.78);
+      box-shadow: none;
+    }
+
+    .opus-logo-badge {
+      color: #f5c18b;
+      background: rgba(244, 162, 97, 0.09);
+      box-shadow: none;
+    }
+
+    .routing-drawer {
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .routing-summary {
+      list-style: none;
+      min-height: 40px;
+      padding: 8px 12px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .routing-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .routing-summary:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .routing-state {
+      color: #2af6de;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+
+    .routing-content {
+      padding: 0 10px 10px;
+    }
+
+    .hijack-banner {
+      margin-bottom: 0;
+      box-shadow: none;
+    }
+
+    @media (max-width: 700px) {
+      .opus-system-sub {
+        display: none;
+      }
+
+      .system-header-bar,
+      .layout-view-modes {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .layout-view-modes {
+        overflow-x: auto;
+      }
+
+      .mode-toggle-btn {
+        flex: 1;
+        white-space: nowrap;
+      }
+
+      .hijack-actions {
+        width: 100%;
+        flex-wrap: wrap;
       }
     }
   `;
@@ -302,9 +397,9 @@ export class VirtualDjWorkspace extends LitElement {
       <!-- Top System Bar & View Layout Switcher -->
       <div class="system-header-bar">
         <div class="brand-system-title">
-          <span class="opus-logo-badge">PIONEER OPUS-QUAD 4-CHANNEL</span>
+          <span class="opus-logo-badge">OPUS-QUAD</span>
           <span class="opus-system-sub">
-            Standalone 4-Deck System • Fan-Shaped Sloping Top Plate • Versatile Multi-Room Zone Output
+            Performance layout
           </span>
         </div>
 
@@ -316,7 +411,7 @@ export class VirtualDjWorkspace extends LitElement {
               this.requestUpdate();
             }}
           >
-            OPUS-QUAD (Flagship)
+            Performance
           </button>
           <button
             class="mode-toggle-btn ${s.viewMode === '4deck_grid' ? 'active' : ''}"
@@ -325,7 +420,7 @@ export class VirtualDjWorkspace extends LitElement {
               this.requestUpdate();
             }}
           >
-            4-Deck Full Grid
+            Four decks
           </button>
           <button
             class="mode-toggle-btn ${s.viewMode === 'classic_dual' ? 'active' : ''}"
@@ -334,21 +429,24 @@ export class VirtualDjWorkspace extends LitElement {
               this.requestUpdate();
             }}
           >
-            Classic Dual Decks
+            Two decks
           </button>
         </div>
       </div>
 
-      <!-- Versatile Zone Output (Multi-Room Venue Audio) -->
-      <div style="margin-bottom: 14px;">
-        <opus-quad-zone-output
-          .engine=${this.engine}
-          .zoneState=${s.zone}
-        ></opus-quad-zone-output>
-      </div>
+      <!-- Advanced venue routing stays available without blocking the decks. -->
+      <details class="routing-drawer">
+        <summary class="routing-summary">
+          <span>Inputs & routing</span>
+          <span class="routing-state">${isHijackActive ? '● LIVE INPUT' : 'Zone · mic · tab audio'} &nbsp;⌄</span>
+        </summary>
+        <div class="routing-content">
+          <opus-quad-zone-output
+            .engine=${this.engine}
+            .zoneState=${s.zone}
+          ></opus-quad-zone-output>
 
-      <!-- Audio Hijack Sapp Live Destination Ingest Banner -->
-      <div class="hijack-banner">
+          <div class="hijack-banner" style="margin-top: 10px;">
         <div class="hijack-info">
           <span class="hijack-badge ${isHijackActive ? 'active' : 'idle'}">
             ${isHijackActive ? '🔴 LIVE INGEST' : '🎙️ AUDIO HIJACK SAPP'}
@@ -416,7 +514,9 @@ export class VirtualDjWorkspace extends LitElement {
                 </button>
               `}
         </div>
-      </div>
+          </div>
+        </div>
+      </details>
 
       <!-- Main Performance Stages -->
       ${s.viewMode === 'opus_quad_4deck'

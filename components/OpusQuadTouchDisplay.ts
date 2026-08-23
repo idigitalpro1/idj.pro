@@ -73,6 +73,28 @@ export class OpusQuadTouchDisplay extends LitElement {
       color: #000000;
     }
 
+    @media (max-width: 520px) {
+      .screen-status-bar {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .screen-tab-nav {
+        width: 100%;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .screen-tab-btn {
+        min-width: 0;
+        padding: 6px 2px;
+        font-size: 0.6rem;
+        white-space: normal;
+      }
+    }
+
     .screen-main-viewport {
       min-height: 230px;
       display: flex;

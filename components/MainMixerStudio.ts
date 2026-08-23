@@ -476,6 +476,73 @@ export class MainMixerStudio extends LitElement {
         min-height: 44px;
       }
     }
+
+    /* Keep the performance surface visually dominant. */
+    .studio-container {
+      gap: 12px;
+    }
+
+    .studio-toolbar {
+      padding: 11px 14px;
+      border-color: rgba(255, 255, 255, 0.09);
+      border-radius: 13px;
+      background: rgba(16, 18, 25, 0.88);
+      box-shadow: none;
+    }
+
+    .studio-badge {
+      color: #2af6de;
+      background: rgba(42, 246, 222, 0.09);
+      box-shadow: none;
+    }
+
+    .studio-heading {
+      font-size: 1rem;
+      background: none;
+      -webkit-text-fill-color: #ffffff;
+    }
+
+    .view-mode-selector {
+      background: rgba(0, 0, 0, 0.28);
+    }
+
+    .mode-btn.active {
+      background: rgba(42, 246, 222, 0.16);
+      color: #cffff9;
+      box-shadow: none;
+    }
+
+    .ai-deck-section-wrapper {
+      border-color: rgba(42, 246, 222, 0.2);
+      border-radius: 14px;
+      box-shadow: none;
+    }
+
+    @media (max-width: 760px) {
+      .studio-toolbar,
+      .studio-title-block {
+        align-items: flex-start;
+      }
+
+      .studio-toolbar,
+      .view-mode-selector {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .view-mode-selector {
+        overflow-x: auto;
+      }
+
+      .mode-btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .studio-subtext {
+        display: none;
+      }
+    }
   `;
 
   @property({ type: Object }) engine!: VirtualDjEngine;
@@ -485,7 +552,7 @@ export class MainMixerStudio extends LitElement {
   @property({ type: Boolean }) isAiRecording = false;
   @property({ type: Number }) aiRecordedSeconds = 0;
 
-  @state() private studioViewMode: MainStudioViewMode = 'full_studio';
+  @state() private studioViewMode: MainStudioViewMode = 'mixer_focus';
 
   private handlePromptChanged(e: CustomEvent<Prompt>) {
     this.dispatchEvent(new CustomEvent('prompt-changed', { detail: e.detail, bubbles: true, composed: true }));
@@ -523,14 +590,14 @@ export class MainMixerStudio extends LitElement {
 
     return html`
       <div class="studio-container">
-        <!-- Studio Organization Toolbar with Layout Mode Selection -->
+        <!-- One workspace selector; the mixer is the default focus. -->
         <div class="studio-toolbar">
           <div class="studio-title-block">
-            <span class="studio-badge">OPUS-QUAD + AI DECK</span>
+            <span class="studio-badge">OPUS-QUAD</span>
             <div>
-              <h1 class="studio-heading">Pioneer OPUS-QUAD Master Studio & AI Live Deck</h1>
+              <h1 class="studio-heading">Performance desk</h1>
               <div class="studio-subtext">
-                4-Channel Standalone System positioned directly above Generative AI Prompt Engine
+                Four decks, mixer and optional generative AI workspace
               </div>
             </div>
           </div>
@@ -541,8 +608,7 @@ export class MainMixerStudio extends LitElement {
               @click=${() => (this.studioViewMode = 'full_studio')}
               title="View both 4-channel mixer and AI generative deck"
             >
-              <span>🎚️⚡</span>
-              <span>Full Studio (Mixer + AI Deck)</span>
+              <span>Mix + AI</span>
             </button>
 
             <button
@@ -550,8 +616,7 @@ export class MainMixerStudio extends LitElement {
               @click=${() => (this.studioViewMode = 'mixer_focus')}
               title="Focus view on 4-channel mixer & waveforms"
             >
-              <span>🎛️</span>
-              <span>Mixer Focus</span>
+              <span>Mixer</span>
             </button>
 
             <button
@@ -559,40 +624,15 @@ export class MainMixerStudio extends LitElement {
               @click=${() => (this.studioViewMode = 'ai_deck_focus')}
               title="Focus view on generative AI live deck"
             >
-              <span>⚡</span>
-              <span>AI Deck Focus</span>
+              <span>AI Deck</span>
             </button>
           </div>
         </div>
 
-        <!-- DJ LOCKJAH Quick Lesson Strip -->
-        <div class="lesson-strip">
-          <div class="lesson-strip-left">
-            <span class="lesson-tag">🏆 2025 CO DJ OF THE YEAR</span>
-            <span style="font-size: 0.8125rem; color: #ffffff; font-weight: 800;">
-              Learn to DJ: Private Personal Lessons Direct to You by <strong>DJ LOCKJAH</strong>
-            </span>
-          </div>
-          <button class="btn-lesson-quick" @click=${this.openDjLessonsModal}>
-            <span>📅</span>
-            <span>LJ Schedule • $50 Deposit</span>
-          </button>
-        </div>
-
-        <!-- 1. Top Primary Zone: 4-Channel Virtual Mixer & Decks Interface -->
+        <!-- Primary mixer workspace -->
         ${showMixer
           ? html`
               <div class="mixer-section-wrapper">
-                <div class="section-header-pill">
-                  <div class="section-header-title">
-                    <span>🎚️</span>
-                    <span>1. Pioneer OPUS-QUAD 4-Channel Mixer & Dual Deck Engine</span>
-                  </div>
-                  <span style="font-size: 0.6875rem; color: rgba(255,255,255,0.6); font-weight: 800;">
-                    STANDALONE 4-CHANNEL MIXER • ZONE 2 OUTPUT • SOUND COLOR FX
-                  </span>
-                </div>
-
                 <virtual-dj-workspace
                   .engine=${this.engine}
                   @toast=${(e: CustomEvent<string>) =>
@@ -602,20 +642,7 @@ export class MainMixerStudio extends LitElement {
             `
           : html``}
 
-        <!-- Visual Flow Divider -->
-        ${showMixer && showAiDeck
-          ? html`
-              <div class="section-divider">
-                <div class="divider-line"></div>
-                <div class="divider-badge">
-                  <span>↓ DIRECT LIVE AUDIO & STEM STREAMING ↓</span>
-                </div>
-                <div class="divider-line"></div>
-              </div>
-            `
-          : html``}
-
-        <!-- 2. Bottom Secondary Zone: Initial AI Generative Deck & Prompt Controller -->
+        <!-- Optional AI workspace -->
         ${showAiDeck
           ? html`
               <div class="ai-deck-section-wrapper">
@@ -624,18 +651,11 @@ export class MainMixerStudio extends LitElement {
                   <div class="ai-deck-brand">
                     <div class="ai-icon-bubble">⚡</div>
                     <div>
-                      <h2 class="ai-deck-title">2. Initial AI Generative Deck & Prompt Matrix</h2>
+                      <h2 class="ai-deck-title">Generative deck</h2>
                       <div class="ai-deck-subtitle">
-                        Multi-prompt generative audio synthesis • Route real-time stems directly into OPUS Decks 1–4
+                        Shape a live prompt mix, then route it to any deck
                       </div>
                     </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="btn-lesson-quick" style="font-size: 0.6875rem; padding: 6px 12px;" @click=${this.openDjLessonsModal}>
-                      <span>🎓</span>
-                      <span>Book Lessons ($50 Dep)</span>
-                    </button>
                   </div>
                 </div>
 

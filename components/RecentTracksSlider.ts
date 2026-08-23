@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import type { DeckTrackState, StreamRecentTrack } from '../types';
 import type { VirtualDjEngine } from '../utils/VirtualDjEngine';
 
@@ -111,6 +111,25 @@ export class RecentTracksSlider extends LitElement {
       gap: 16px;
       max-width: 1400px;
       margin: 0 auto;
+    }
+
+    .drawer-toggle {
+      border: 0;
+      background: transparent;
+      color: #fff;
+      padding: 7px 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .drawer-hint {
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 0.68rem;
+      font-weight: 700;
     }
 
     .slider-label-group {
@@ -244,9 +263,27 @@ export class RecentTracksSlider extends LitElement {
     .mini-deck-B:hover {
       box-shadow: 0 0 8px #2af6de;
     }
+
+    @media (max-width: 700px) {
+      :host {
+        bottom: 58px;
+        padding-inline: 10px;
+      }
+
+      .slider-container.expanded {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .marquee-card {
+        min-width: 210px;
+      }
+    }
   `;
 
   @property({ attribute: false }) public engine!: VirtualDjEngine;
+  @state() private expanded = false;
 
   private loadStreamTrackToDeck(deckId: 'A' | 'B', track: StreamRecentTrack) {
     const deckTrack: DeckTrackState = {
@@ -273,41 +310,51 @@ export class RecentTracksSlider extends LitElement {
 
   override render() {
     return html`
-      <div class="slider-container">
-        <div class="slider-label-group">
+      <div class="slider-container ${this.expanded ? 'expanded' : ''}">
+        <button
+          class="drawer-toggle"
+          @click=${() => (this.expanded = !this.expanded)}
+          aria-expanded=${this.expanded}
+          title="${this.expanded ? 'Hide' : 'Show'} recent tracks"
+        >
           <span class="live-pulse-dot"></span>
-          <span class="slider-title">Recently Generated & Streamed</span>
-        </div>
+          <span class="slider-title">Recent tracks</span>
+          <span class="drawer-hint">${this.expanded ? 'Hide ↓' : 'Show ↑'}</span>
+        </button>
 
-        <div class="tracks-marquee">
-          ${RECENT_STREAM_TRACKS.map(
-            (track) => html`
-              <div class="marquee-card">
-                <img src="${track.coverArt}" alt="${track.title}" class="card-thumb" />
-                <div class="card-text-block">
-                  <span class="card-title">${track.title}</span>
-                  <span class="card-subtitle">${track.artist} • ${track.bpm} BPM</span>
-                </div>
-                <div class="card-load-actions">
-                  <button
-                    class="mini-load-btn mini-deck-A"
-                    @click=${() => this.loadStreamTrackToDeck('A', track)}
-                    title="Load to Deck A"
-                  >
-                    Deck A
-                  </button>
-                  <button
-                    class="mini-load-btn mini-deck-B"
-                    @click=${() => this.loadStreamTrackToDeck('B', track)}
-                    title="Load to Deck B"
-                  >
-                    Deck B
-                  </button>
-                </div>
+        ${this.expanded
+          ? html`
+              <div class="tracks-marquee">
+                ${RECENT_STREAM_TRACKS.map(
+                  (track) => html`
+                    <div class="marquee-card">
+                      <img src="${track.coverArt}" alt="${track.title}" class="card-thumb" />
+                      <div class="card-text-block">
+                        <span class="card-title">${track.title}</span>
+                        <span class="card-subtitle">${track.artist} • ${track.bpm} BPM</span>
+                      </div>
+                      <div class="card-load-actions">
+                        <button
+                          class="mini-load-btn mini-deck-A"
+                          @click=${() => this.loadStreamTrackToDeck('A', track)}
+                          title="Load to Deck A"
+                        >
+                          Deck A
+                        </button>
+                        <button
+                          class="mini-load-btn mini-deck-B"
+                          @click=${() => this.loadStreamTrackToDeck('B', track)}
+                          title="Load to Deck B"
+                        >
+                          Deck B
+                        </button>
+                      </div>
+                    </div>
+                  `
+                )}
               </div>
             `
-          )}
-        </div>
+          : html``}
       </div>
     `;
   }
