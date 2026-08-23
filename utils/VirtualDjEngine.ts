@@ -37,6 +37,10 @@ import { BUILTIN_DECALS } from './AuthService';
 import { SessionStorageService } from './SessionStorageService';
 import { TrackHistoryService } from './TrackHistoryService';
 
+// Procedural audio is a repeating preview, not a full decoded song. Keeping it
+// short avoids blocking the browser's main thread and allocating hundreds of MB.
+const PROCEDURAL_LOOP_SECONDS = 12;
+
 const STEM_WORKLET_CODE = `
 class IdproStemProcessor extends AudioWorkletProcessor {
   static get parameterDescriptors() {
@@ -1693,10 +1697,6 @@ export class VirtualDjEngine extends EventTarget {
 
     this.stopDeck(targetDeckId);
 
-    if (!track.audioBuffer) {
-      track.audioBuffer = this.generateProceduralTrackAudio(track);
-    }
-
     state.loadedTrack = track;
     state.currentTime = 0;
     this.deckPlayOffsets[targetDeckId] = 0;
@@ -1721,8 +1721,14 @@ export class VirtualDjEngine extends EventTarget {
     const state = this.deckStates[targetDeckId];
     const nodes = this.deckNodes[targetDeckId];
 
-    if (!state.loadedTrack || !state.loadedTrack.audioBuffer) return;
+    if (!state.loadedTrack) return;
     if (state.isPlaying) return;
+
+    // Synthesize fallback audio only after an explicit play gesture. Demo and
+    // metadata-only tracks therefore do no expensive PCM work during startup.
+    if (!state.loadedTrack.audioBuffer) {
+      state.loadedTrack.audioBuffer = this.generateProceduralTrackAudio(state.loadedTrack);
+    }
 
     const buffer = state.loadedTrack.audioBuffer;
     const source = this.audioContext.createBufferSource();
@@ -1731,7 +1737,8 @@ export class VirtualDjEngine extends EventTarget {
     // Apply pitch + keyShift
     const pitchMultiplier = Math.pow(2, state.keyShift / 12);
     source.playbackRate.value = state.playbackRate * (state.keyLock ? 1.0 : pitchMultiplier);
-    source.loop = state.isLooping;
+    const isProceduralPreview = buffer.duration < state.loadedTrack.duration;
+    source.loop = state.isLooping || isProceduralPreview;
 
     if (state.isLooping && state.loopLength) {
       const beatSec = 60 / (state.loadedTrack.bpm * state.playbackRate);
@@ -2502,6 +2509,8 @@ export class VirtualDjEngine extends EventTarget {
             const loopStart = this.deckPlayOffsets[deckId] % totalDur;
             const loopPos = loopStart + (elapsed % loopDur);
             state.currentTime = loopPos % totalDur;
+          } else if (this.deckNodes[deckId].source?.loop) {
+            state.currentTime = (this.deckPlayOffsets[deckId] + elapsed) % totalDur;
           } else {
             state.currentTime = Math.min(totalDur, this.deckPlayOffsets[deckId] + elapsed);
           }
@@ -2567,10 +2576,11 @@ export class VirtualDjEngine extends EventTarget {
       },
     ];
 
-    this.loadTrackToDeck('1', demoTracks[0]);
-    this.loadTrackToDeck('2', demoTracks[1]);
-    this.loadTrackToDeck('3', demoTracks[2]);
-    this.loadTrackToDeck('4', demoTracks[3]);
+    (['1', '2', '3', '4'] as OpusDeckId[]).forEach((deckId, index) => {
+      this.deckStates[deckId].loadedTrack = demoTracks[index];
+      this.deckStates[deckId].currentTime = 0;
+      this.deckPlayOffsets[deckId] = 0;
+    });
   }
 
   // --- Procedural High-Quality Demo Track Audio Generator ---
@@ -2580,7 +2590,7 @@ export class VirtualDjEngine extends EventTarget {
     source: string = 'beatport'
   ): AudioBuffer {
     const sampleRate = this.audioContext.sampleRate;
-    const dur = Math.min(300, Math.max(30, duration));
+    const dur = Math.min(PROCEDURAL_LOOP_SECONDS, Math.max(4, duration));
     const numFrames = Math.floor(sampleRate * dur);
     const buffer = this.audioContext.createBuffer(2, numFrames, sampleRate);
     const chL = buffer.getChannelData(0);
@@ -2638,7 +2648,7 @@ export class VirtualDjEngine extends EventTarget {
   }
 
   private generateProceduralTrackAudio(track: DeckTrackState): AudioBuffer {
-    return this.synthesizeElectronicTrackAudio(track.bpm || 128, track.duration || 180, track.source);
+    return this.synthesizeElectronicTrackAudio(track.bpm || 128, PROCEDURAL_LOOP_SECONDS, track.source);
   }
 
   // --- Procedural Lounge Ambient Buffer for Zone Output ---
