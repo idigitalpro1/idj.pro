@@ -1317,7 +1317,7 @@ export class PromptDjMidi extends LitElement {
                 role="button"
                 aria-haspopup="menu"
                 aria-label="Open more workspaces"
-              >More <span aria-hidden="true">⌄</span></summary>
+              ><span aria-hidden="true">🔥</span> More <span aria-hidden="true">⌄</span></summary>
               <div class="menu-popover">
                 <button
                   class="menu-action ${this.activeView === 'stems_ai' ? 'active' : ''}"
