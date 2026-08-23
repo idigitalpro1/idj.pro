@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import type { PlaybackState, Prompt } from '../types';
-import type { AudioChunk, GoogleGenAI, LiveMusicFilteredPrompt, LiveMusicServerMessage, LiveMusicSession } from '@google/genai';
+import type { AudioChunk, LiveMusicFilteredPrompt, LiveMusicServerMessage } from '@google/genai';
+import { connectToLiveMusic, type SecureLiveMusicSession } from './SecureLiveMusicClient';
 import { decode, decodeAudioData } from './audio';
 import { throttle } from './throttle';
 
 export class LiveMusicHelper extends EventTarget {
 
-  private ai: GoogleGenAI;
   private model: string;
 
-  private session: LiveMusicSession | null = null;
-  private sessionPromise: Promise<LiveMusicSession> | null = null;
+  private session: SecureLiveMusicSession | null = null;
+  private sessionPromise: Promise<SecureLiveMusicSession> | null = null;
 
   private connectionError = true;
 
@@ -35,22 +35,21 @@ export class LiveMusicHelper extends EventTarget {
   private recordedBuffers: AudioBuffer[] = [];
   private recordingInterval: number | null = null;
 
-  constructor(ai: GoogleGenAI, model: string) {
+  constructor(model: string) {
     super();
-    this.ai = ai;
     this.model = model;
     this.prompts = new Map();
     this.audioContext = new AudioContext({ sampleRate: 48000 });
     this.outputNode = this.audioContext.createGain();
   }
 
-  private getSession(): Promise<LiveMusicSession> {
+  private getSession(): Promise<SecureLiveMusicSession> {
     if (!this.sessionPromise) this.sessionPromise = this.connect();
     return this.sessionPromise;
   }
 
-  private async connect(): Promise<LiveMusicSession> {
-    this.sessionPromise = this.ai.live.music.connect({
+  private async connect(): Promise<SecureLiveMusicSession> {
+    this.sessionPromise = connectToLiveMusic({
       model: this.model,
       callbacks: {
         onmessage: async (e: LiveMusicServerMessage) => {

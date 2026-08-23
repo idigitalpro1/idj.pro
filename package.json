@@ -12,10 +12,12 @@
   "dependencies": {
     "@google/genai": "^1.0.0",
     "firebase": "^12.18.0",
-    "lit": "^3.3.0"
+    "lit": "^3.3.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "@types/ws": "^8.18.1",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }

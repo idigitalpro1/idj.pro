@@ -5,16 +5,12 @@
  */
 
 import type { PlaybackState, Prompt } from './types';
-import { GoogleGenAI, LiveMusicFilteredPrompt } from '@google/genai';
+import type { LiveMusicFilteredPrompt } from '@google/genai';
 import { PromptDjMidi } from './components/PromptDjMidi';
 import { ToastMessage } from './components/ToastMessage';
 import { LiveMusicHelper } from './utils/LiveMusicHelper';
 import { AudioAnalyser } from './utils/AudioAnalyser';
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || '',
-  apiVersion: 'v1alpha',
-});
 const model = 'lyria-realtime-exp';
 
 function main() {
@@ -26,7 +22,7 @@ function main() {
   const toastMessage = new ToastMessage();
   document.body.appendChild(toastMessage);
 
-  const liveMusicHelper = new LiveMusicHelper(ai, model);
+  const liveMusicHelper = new LiveMusicHelper(model);
   liveMusicHelper.setWeightedPrompts(initialPrompts);
   pdjMidi.liveMusicHelper = liveMusicHelper;
 
