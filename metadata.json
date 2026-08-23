@@ -1,6 +1,6 @@
 {
   "name": "iDj.pro by idpro.com",
-  "description": "Pioneer OPUS-QUAD 4-Channel Standalone DJ System with Live AI Generative Deck below mixer on startup, Learn to DJ Private Lessons by DJ LOCKJAH (2025 Colorado DJ of the Year Award Recipient) with LJ Schedule & $50 deposit reservation, Real-Time Neural Stem Separation, Video & CDG Karaoke Mixing, Extensive Hardware Controller Compatibility, Beatport LINK integration, Multi-Room Zone Output, Sound Color & Beat FX, and custom decals.",
+  "description": "Pioneer OPUS-QUAD 4-Channel Standalone DJ System with Google Drive Cloud Music Crate & Stem storage, Live AI Generative Deck below mixer on startup, Learn to DJ Private Lessons by DJ LOCKJAH (2025 Colorado DJ of the Year Award Recipient) with LJ Schedule & $50 deposit reservation, Real-Time Neural Stem Separation, Video & CDG Karaoke Mixing, Extensive Hardware Controller Compatibility, Beatport LINK integration, Multi-Room Zone Output, Sound Color & Beat FX, and custom decals.",
   "requestFramePermissions": [
     "midi",
     "microphone"

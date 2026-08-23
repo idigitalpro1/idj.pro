@@ -253,19 +253,26 @@ export class UserProfileModal extends LitElement {
     this.editSoundcloud = p.socials?.soundcloud || '';
   }
 
-  private handleGoogleLogin() {
-    const p = this.authService.loginWithGoogle({
-      name: this.editName || 'iDpro Resident DJ',
-      email: this.editEmail || 'idjpro.dj@idpro.com',
-    });
-    this.dispatchEvent(
-      new CustomEvent('toast', {
-        detail: `Signed in as ${p.name} (${p.djAlias})!`,
-        bubbles: true,
-        composed: true,
-      })
-    );
-    this.close();
+  private async handleGoogleLogin() {
+    try {
+      const p = await this.authService.loginWithGoogleDrive();
+      this.dispatchEvent(
+        new CustomEvent('toast', {
+          detail: `Signed in with Google as ${p.name}! Google Drive connected.`,
+          bubbles: true,
+          composed: true,
+        })
+      );
+      this.close();
+    } catch (err: any) {
+      this.dispatchEvent(
+        new CustomEvent('toast', {
+          detail: `Google sign-in error: ${err.message || 'Cancelled'}`,
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
   }
 
   private handleContinueGuest() {

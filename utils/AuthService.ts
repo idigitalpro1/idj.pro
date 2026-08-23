@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { CustomDecal, UserProfile } from '../types';
+import { GoogleDriveService } from './GoogleDriveService';
 
 export const BUILTIN_DECALS: CustomDecal[] = [
   {
@@ -91,6 +92,38 @@ export class AuthService extends EventTarget {
     };
     this.saveProfile(guest);
     return guest;
+  }
+
+  public async loginWithGoogleDrive(): Promise<UserProfile> {
+    const driveService = GoogleDriveService.getInstance();
+    const res = await driveService.signIn();
+    if (res?.user) {
+      const name = res.user.displayName || 'Google DJ';
+      const email = res.user.email || 'dj@gmail.com';
+      const djAlias = name.split(' ')[0] ? `DJ ${name.split(' ')[0]}` : 'DJ Drive';
+      const avatarUrl = res.user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`;
+
+      this.currentProfile = {
+        ...this.currentProfile,
+        id: `google-${res.user.uid}`,
+        name,
+        djAlias,
+        email,
+        avatarUrl,
+        isGuest: false,
+        createdAt: this.currentProfile.createdAt || Date.now(),
+      };
+      this.saveProfile(this.currentProfile);
+      this.dispatchEvent(new CustomEvent('auth-state-changed', { detail: this.currentProfile }));
+      this.dispatchEvent(new CustomEvent('profile-changed', { detail: this.currentProfile }));
+    }
+    return this.currentProfile;
+  }
+
+  public async logoutGoogle(): Promise<UserProfile> {
+    const driveService = GoogleDriveService.getInstance();
+    await driveService.signOut();
+    return this.logout();
   }
 
   public updateProfile(updates: Partial<UserProfile>): UserProfile {

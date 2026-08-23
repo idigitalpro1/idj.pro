@@ -4,15 +4,16 @@
  */
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { DeckTrackState } from '../types';
+import type { DeckTrackState, GoogleDriveAudioFile, GoogleDriveState, OpusDeckId } from '../types';
 import { TOP_10_ELECTRONIC_GENRES, type ElectronicGenreCategory } from '../types';
 import type { VirtualDjEngine } from '../utils/VirtualDjEngine';
+import { GoogleDriveService } from '../utils/GoogleDriveService';
 
 export interface CuratedSourceTrack {
   id: string;
   title: string;
   artist: string;
-  source: 'spotify' | 'apple_music' | 'mixcloud' | 'beatport' | 'file' | 'cloud_library';
+  source: 'spotify' | 'apple_music' | 'mixcloud' | 'beatport' | 'file' | 'cloud_library' | 'google_drive';
   genre: string;
   genreCategory?: string;
   bpm: number;
@@ -853,12 +854,30 @@ export class AudioSourcesHub extends LitElement {
 
   @property({ attribute: false }) public engine!: VirtualDjEngine;
 
-  @state() private activeTab: 'all' | 'beatport' | 'spotify' | 'apple_music' | 'mixcloud' | 'local_file' = 'all';
+  @state() private activeTab: 'all' | 'beatport' | 'spotify' | 'apple_music' | 'mixcloud' | 'local_file' | 'google_drive' = 'all';
   @state() private selectedGenreId: string = 'all';
   @state() private urlInput = '';
   @state() private isDraggingOver = false;
   @state() private previewingTrackId: string | null = null;
+  @state() private driveState: GoogleDriveState = GoogleDriveService.getInstance().getState();
   private previewAudioNode: AudioNode | null = null;
+  private driveService = GoogleDriveService.getInstance();
+
+  override connectedCallback() {
+    super.connectedCallback();
+    this.driveService.addEventListener('drive-state-changed', this.handleDriveStateChanged as EventListener);
+    this.driveState = this.driveService.getState();
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this.driveService.removeEventListener('drive-state-changed', this.handleDriveStateChanged as EventListener);
+  }
+
+  private handleDriveStateChanged = (e: CustomEvent<GoogleDriveState>) => {
+    this.driveState = e.detail;
+    this.requestUpdate();
+  };
 
 
   private handleFileUpload(files: FileList | null) {
@@ -937,6 +956,12 @@ export class AudioSourcesHub extends LitElement {
       artist = 'Mixcloud Stream';
       genre = 'DJ Mix';
       bpm = 130;
+    } else if (url.includes('drive.google.com')) {
+      source = 'google_drive';
+      title = 'Google Drive Cloud Audio Ingest';
+      artist = 'Google Drive Cloud';
+      genre = 'Cloud Master';
+      bpm = 126;
     }
 
     const track: DeckTrackState = {
@@ -1149,7 +1174,52 @@ export class AudioSourcesHub extends LitElement {
           >
             Mixcloud Sets
           </button>
+          <button
+            class="source-tab-btn ${this.activeTab === 'google_drive' ? 'active' : ''}"
+            style="${this.activeTab === 'google_drive' ? 'background: #4285f4; color: #fff; box-shadow: 0 0 14px rgba(66, 133, 244, 0.4);' : 'border-color: rgba(66, 133, 244, 0.4);'}"
+            @click=${() => (this.activeTab = 'google_drive')}
+          >
+            <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 87.3 78">
+              <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+              <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+              <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+              <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+              <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+              <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+            </svg>
+            Google Drive Crate
+          </button>
         </div>
+
+        ${this.activeTab === 'google_drive'
+          ? html`
+              <div style="background: rgba(66, 133, 244, 0.08); border: 1px solid rgba(66, 133, 244, 0.3); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg style="width: 24px; height: 24px;" viewBox="0 0 87.3 78">
+                      <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+                      <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+                      <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+                      <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+                      <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+                      <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+                    </svg>
+                    <div>
+                      <div style="font-size: 0.9375rem; font-weight: 800; color: #fff;">Google Drive Music Crate & Cloud Storage</div>
+                      <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6);">Stream DJ sets, lossless WAV stems, and tracks directly from your Google Drive account.</div>
+                    </div>
+                  </div>
+                  <button
+                    class="load-url-btn"
+                    style="background: #4285f4; color: #fff; font-size: 0.8125rem;"
+                    @click=${() => this.dispatchEvent(new CustomEvent('open-drive-modal', { bubbles: true, composed: true }))}
+                  >
+                    🚀 Open Full Drive Browser & File Manager
+                  </button>
+                </div>
+              </div>
+            `
+          : ''}
 
         <!-- URL Ingestion Card -->
         <div class="url-ingest-card">

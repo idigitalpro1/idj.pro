@@ -26,6 +26,7 @@ import './DjLessonsBookingModal';
 import './DjLockjahLessonsSection';
 import './MainMixerStudio';
 import './LatencyCalibrationModal';
+import './GoogleDriveBrowserModal';
 
 import type { AudioEngineHealth, MidiAccessStatus, MidiDeviceInfo, OpusDeckId, PlaybackState, Prompt, UserProfile } from '../types';
 import { MidiDispatcher } from '../utils/MidiDispatcher';
@@ -231,6 +232,28 @@ export class PromptDjMidi extends LitElement {
     .btn-lessons-pill:hover {
       background: linear-gradient(135deg, rgba(255, 183, 3, 0.4), rgba(255, 77, 79, 0.35));
       box-shadow: 0 0 20px rgba(255, 183, 3, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-drive-pill {
+      background: linear-gradient(135deg, rgba(66, 133, 244, 0.2), rgba(52, 168, 83, 0.15));
+      border: 1px solid rgba(66, 133, 244, 0.5);
+      border-radius: 8px;
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #ffffff;
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 800;
+      transition: all 0.15s;
+      box-shadow: 0 0 12px rgba(66, 133, 244, 0.25);
+    }
+    .btn-drive-pill:hover {
+      background: linear-gradient(135deg, rgba(66, 133, 244, 0.35), rgba(52, 168, 83, 0.25));
+      box-shadow: 0 0 20px rgba(66, 133, 244, 0.5);
       transform: translateY(-1px);
     }
 
@@ -606,6 +629,7 @@ export class PromptDjMidi extends LitElement {
   @state() private isHistoryModalOpen = false;
   @state() private isDjLessonsModalOpen = false;
   @state() private isLatencyModalOpen = false;
+  @state() private isDriveModalOpen = false;
   @state() private decalTargetDeck: 'A' | 'B' = 'A';
 
   @property({ type: Object })
@@ -655,6 +679,14 @@ export class PromptDjMidi extends LitElement {
 
     this.addEventListener('open-latency-modal', (() => {
       this.isLatencyModalOpen = true;
+    }) as EventListener);
+
+    this.addEventListener('open-drive-modal', (() => {
+      this.isDriveModalOpen = true;
+    }) as EventListener);
+
+    this.addEventListener('close-drive-modal', (() => {
+      this.isDriveModalOpen = false;
     }) as EventListener);
 
     // Auto-restore checkpointed session on app startup
@@ -944,6 +976,23 @@ export class PromptDjMidi extends LitElement {
               title="Upload and manage custom vinyl decals and slipmats"
             >
               <span>🎨 Art Decals</span>
+            </button>
+
+            <!-- Google Drive Cloud Crate Trigger -->
+            <button
+              class="btn-drive-pill"
+              @click=${() => (this.isDriveModalOpen = true)}
+              title="Google Drive Cloud Music Crate & Track Management"
+            >
+              <svg style="width: 14px; height: 14px;" viewBox="0 0 87.3 78">
+                <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+                <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+                <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+                <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+                <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+                <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+              </svg>
+              <span>Drive Crate</span>
             </button>
 
             <!-- User Profile & Google Login Trigger -->
@@ -1251,6 +1300,14 @@ export class PromptDjMidi extends LitElement {
         .engine=${this.virtualDjEngine}
         @close-latency-modal=${() => (this.isLatencyModalOpen = false)}
       ></latency-calibration-modal>
+
+      <google-drive-browser-modal
+        .isOpen=${this.isDriveModalOpen}
+        .engine=${this.virtualDjEngine}
+        @close-drive-modal=${() => (this.isDriveModalOpen = false)}
+        @toast=${(e: CustomEvent<string>) =>
+          this.dispatchEvent(new CustomEvent('error', { detail: e.detail }))}
+      ></google-drive-browser-modal>
 
       <midi-visualizer .midiDispatcher=${this.midiDispatcher}></midi-visualizer>
     `;

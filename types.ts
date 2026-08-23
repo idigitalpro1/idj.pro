@@ -348,6 +348,7 @@ export type AudioSourceType =
   | 'mixcloud'
   | 'beatport'
   | 'file'
+  | 'google_drive'
   | 'hijack'
   | 'ai_gen'
   | 'cloud'
@@ -362,7 +363,7 @@ export type AudioSourceType =
 
 export type BeatFxType = 'delay' | 'echo' | 'pingpong' | 'spiral' | 'reverb' | 'shimmer' | 'flanger' | 'phaser' | 'pitch' | 'slip_roll' | 'roll' | 'filter' | 'trans' | 'helix';
 export type SoundColorFxType = 'space' | 'dub_echo' | 'sweep' | 'noise' | 'crush' | 'filter';
-export type OpusMediaSource = 'usb_1' | 'usb_2' | 'usb_3_usbc' | 'bluetooth' | 'cloud' | 'rekordbox' | 'serato' | 'beatport' | 'hijack';
+export type OpusMediaSource = 'usb_1' | 'usb_2' | 'usb_3_usbc' | 'bluetooth' | 'cloud' | 'google_drive' | 'rekordbox' | 'serato' | 'beatport' | 'hijack';
 export type PadMode = 'hot_cue' | 'beat_loop' | 'beat_jump' | 'key_shift';
 
 export interface DeckTrackState {
@@ -678,5 +679,41 @@ export const TOP_10_ELECTRONIC_GENRES: ElectronicGenreCategory[] = [
     icon: '🕶️',
   },
 ];
+
+// Google Drive Music Library & Crate Types
+export interface GoogleDriveAudioFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  size?: string;
+  sizeFormatted?: string;
+  createdTime?: string;
+  modifiedTime?: string;
+  thumbnailLink?: string;
+  webContentLink?: string;
+  iconLink?: string;
+  duration?: number;
+  bpm?: number;
+  key?: string;
+  isFolder?: boolean;
+}
+
+export interface GoogleDriveState {
+  isAuthenticated: boolean;
+  isConnecting: boolean;
+  userEmail: string | null;
+  userName: string | null;
+  userPhoto: string | null;
+  files: GoogleDriveAudioFile[];
+  currentFolderId: string | null;
+  folderPath: { id: string; name: string }[];
+  isLoadingFiles: boolean;
+  searchQuery: string;
+  selectedFileId: string | null;
+  activeUploadProgress: number | null;
+  activeDownloadFileId: string | null;
+  error: string | null;
+}
+
 
 
