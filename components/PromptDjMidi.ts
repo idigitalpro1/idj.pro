@@ -1274,14 +1274,14 @@ export class PromptDjMidi extends LitElement {
       <div id="top-nav-container">
         <div class="app-bar">
           <a
-            href="https://idpro.com"
+            href="https://yknotrecords.com"
             target="_blank"
             rel="noopener noreferrer"
             class="brand-pill"
-            title="Visit idpro.com"
+            title="Visit yknotrecords.com"
           >
-            <span class="brand-logo-text">iDj.pro</span>
-            <span class="brand-by">by idpro.com</span>
+            <span class="brand-logo-text">LiveDJ.pro</span>
+            <span class="brand-by">By Patrick Sweeney</span>
             <span class="brand-link-tag">LIVE</span>
           </a>
 
