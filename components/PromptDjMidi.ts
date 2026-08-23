@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
@@ -844,7 +844,15 @@ export class PromptDjMidi extends LitElement {
       }
 
       #top-nav-container {
+        top: 6px;
+        margin: 6px 0 12px;
+        padding: 6px 8px;
+        border-radius: 12px;
         backdrop-filter: none;
+      }
+
+      .app-bar {
+        min-height: 44px;
       }
 
       .brand-by,
@@ -1304,7 +1312,12 @@ export class PromptDjMidi extends LitElement {
             </button>
 
             <details class="menu">
-              <summary class="menu-trigger">More <span aria-hidden="true">⌄</span></summary>
+              <summary
+                class="menu-trigger"
+                role="button"
+                aria-haspopup="menu"
+                aria-label="Open more workspaces"
+              >More <span aria-hidden="true">⌄</span></summary>
               <div class="menu-popover">
                 <button
                   class="menu-action ${this.activeView === 'stems_ai' ? 'active' : ''}"
@@ -1340,7 +1353,12 @@ export class PromptDjMidi extends LitElement {
             </button>
 
             <details class="menu">
-              <summary class="menu-trigger" aria-label="Open tools">Tools <span aria-hidden="true">⌄</span></summary>
+              <summary
+                class="menu-trigger"
+                role="button"
+                aria-haspopup="menu"
+                aria-label="Open tools"
+              >Tools <span aria-hidden="true">⌄</span></summary>
               <div class="menu-popover">
                 <button class="menu-action" @click=${() => (this.isDriveModalOpen = true)}>
                   <span>☁</span><span>Drive crate</span>
@@ -1581,7 +1599,9 @@ export class PromptDjMidi extends LitElement {
           this.dispatchEvent(new CustomEvent('error', { detail: e.detail }))}
       ></google-drive-browser-modal>
 
-      <midi-visualizer .midiDispatcher=${this.midiDispatcher}></midi-visualizer>
+      ${this.activeView === 'hardware_hub'
+        ? html`<midi-visualizer .midiDispatcher=${this.midiDispatcher}></midi-visualizer>`
+        : nothing}
     `;
   }
 
