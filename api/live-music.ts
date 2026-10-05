@@ -4,6 +4,7 @@ import {
   type LiveMusicGenerationConfig,
   type LiveMusicSession,
 } from '@google/genai';
+import { createClerkClient } from '@clerk/backend';
 import { WebSocketServer, type RawData, type WebSocket } from 'ws';
 
 const MODEL = 'lyria-realtime-exp';
@@ -46,6 +47,82 @@ function isRateLimited(req: http.IncomingMessage): boolean {
 
 function send(socket: WebSocket, value: unknown) {
   if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(value));
+}
+
+function parseAllowedEmails(): string[] {
+  return (process.env.ALLOWED_EMAILS ?? '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function incomingMessageToRequest(req: http.IncomingMessage): Request {
+  const host = (req.headers['x-forwarded-host'] ?? req.headers.host ?? 'localhost') as string;
+  const protoHeader = req.headers['x-forwarded-proto'];
+  const proto = (Array.isArray(protoHeader) ? protoHeader[0] : protoHeader) || 'https';
+  const url = new URL(req.url || '/', `${proto}://${host}`);
+
+  const headers = new Headers();
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (value == null) continue;
+    headers.set(key, Array.isArray(value) ? value.join(', ') : value);
+  }
+
+  // Browser WebSocket cannot set Authorization; client sends ?__clerk_token= (or access_token).
+  const queryToken =
+    url.searchParams.get('__clerk_token')
+    ?? url.searchParams.get('access_token');
+  if (queryToken && !headers.has('authorization')) {
+    headers.set('authorization', `Bearer ${queryToken}`);
+  }
+
+  return new Request(url.toString(), { method: 'GET', headers });
+}
+
+/**
+ * Authenticate via Authorization Bearer session JWT, __session cookie, or
+ * __clerk_token / access_token query param (mapped to Bearer above).
+ */
+async function authenticateClerk(req: http.IncomingMessage): Promise<{ userId: string } | null> {
+  const secretKey = process.env.CLERK_SECRET_KEY;
+  if (!secretKey) {
+    console.error('CLERK_SECRET_KEY is not configured');
+    return null;
+  }
+
+  const publishableKey =
+    process.env.CLERK_PUBLISHABLE_KEY
+    || process.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+  const clerk = createClerkClient({
+    secretKey,
+    ...(publishableKey ? { publishableKey } : {}),
+  });
+
+  const request = incomingMessageToRequest(req);
+  const state = await clerk.authenticateRequest(request);
+
+  if (!state.isAuthenticated) {
+    return null;
+  }
+
+  const auth = state.toAuth();
+  const userId = auth?.userId;
+  if (!userId) {
+    return null;
+  }
+
+  const allowlist = parseAllowedEmails();
+  if (allowlist.length > 0) {
+    const user = await clerk.users.getUser(userId);
+    const primary = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId);
+    const email = (primary?.emailAddress ?? user.emailAddresses[0]?.emailAddress ?? '').toLowerCase();
+    if (!email || !allowlist.includes(email)) {
+      return null;
+    }
+  }
+
+  return { userId };
 }
 
 async function handleCommand(session: LiveMusicSession, raw: RawData) {
@@ -91,6 +168,20 @@ const wss = new WebSocketServer({ server, maxPayload: 64 * 1024 });
 wss.on('connection', async (socket, req) => {
   if (!isAllowedOrigin(req) || isRateLimited(req)) {
     socket.close(1008, 'Connection rejected');
+    return;
+  }
+
+  let authResult: { userId: string } | null = null;
+  try {
+    authResult = await authenticateClerk(req);
+  } catch (err) {
+    console.error('Clerk authentication failed', err);
+    socket.close(1008, 'Unauthorized');
+    return;
+  }
+
+  if (!authResult) {
+    socket.close(1008, 'Unauthorized');
     return;
   }
 
