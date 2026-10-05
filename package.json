@@ -10,6 +10,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/backend": "^3.22.0",
+    "@clerk/clerk-js": "^6.37.0",
     "@google/genai": "^1.0.0",
     "firebase": "^12.18.0",
     "lit": "^3.3.0",

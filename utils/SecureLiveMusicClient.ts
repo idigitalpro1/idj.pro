@@ -3,6 +3,7 @@ import type {
   LiveMusicServerMessage,
   WeightedPrompt,
 } from '@google/genai';
+import { getClerkSessionToken } from './clerkAuth';
 
 type LiveMusicCommand =
   | { type: 'set-weighted-prompts'; weightedPrompts: WeightedPrompt[] }
@@ -33,13 +34,19 @@ interface ConnectOptions {
   };
 }
 
-export function connectToLiveMusic({ model, callbacks }: ConnectOptions): Promise<SecureLiveMusicSession> {
-  return new Promise((resolve, reject) => {
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = new URL('/api/live-music', `${protocol}//${location.host}`);
-    // The model is fixed server-side so a client cannot spend quota on another model.
-    void model;
+export async function connectToLiveMusic({ model, callbacks }: ConnectOptions): Promise<SecureLiveMusicSession> {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const url = new URL('/api/live-music', `${protocol}//${location.host}`);
+  // The model is fixed server-side so a client cannot spend quota on another model.
+  void model;
 
+  // Browsers cannot set Authorization on WebSocket; pass Clerk session JWT as a query param.
+  const token = await getClerkSessionToken();
+  if (token) {
+    url.searchParams.set('__clerk_token', token);
+  }
+
+  return new Promise((resolve, reject) => {
     const socket = new WebSocket(url);
     let settled = false;
 

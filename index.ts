@@ -6,10 +6,12 @@
 
 import type { PlaybackState, Prompt } from './types';
 import type { LiveMusicFilteredPrompt } from '@google/genai';
+import { Clerk } from '@clerk/clerk-js';
 import { PromptDjMidi } from './components/PromptDjMidi';
 import { ToastMessage } from './components/ToastMessage';
 import { LiveMusicHelper } from './utils/LiveMusicHelper';
 import { AudioAnalyser } from './utils/AudioAnalyser';
+import { setClerkInstance } from './utils/clerkAuth';
 
 const model = 'lyria-realtime-exp';
 
@@ -148,4 +150,96 @@ const DEFAULT_PROMPTS = [
   { color: '#9900ff', text: 'Lush Organ Chords' },
 ];
 
-main();
+
+function showConfigError(message: string) {
+  const el = document.createElement('div');
+  el.setAttribute('role', 'alert');
+  el.style.cssText = [
+    'min-height:100vh',
+    'display:flex',
+    'align-items:center',
+    'justify-content:center',
+    'padding:2rem',
+    'font-family:system-ui,sans-serif',
+    'background:#0a0a12',
+    'color:#ff6b6b',
+    'text-align:center',
+    'line-height:1.5',
+  ].join(';');
+  el.textContent = message;
+  document.body.replaceChildren(el);
+}
+
+function mountSignInShell(): HTMLDivElement {
+  const root = document.createElement('div');
+  root.id = 'clerk-auth-gate';
+  root.style.cssText = [
+    'min-height:100vh',
+    'display:flex',
+    'flex-direction:column',
+    'align-items:center',
+    'justify-content:center',
+    'gap:1.25rem',
+    'padding:2rem',
+    'font-family:system-ui,sans-serif',
+    'background:#0a0a12',
+    'color:#e8e8f0',
+  ].join(';');
+
+  const title = document.createElement('h1');
+  title.textContent = 'iDj.pro';
+  title.style.cssText = 'margin:0;font-size:1.75rem;letter-spacing:0.08em;color:#ff25f6;';
+
+  const subtitle = document.createElement('p');
+  subtitle.textContent = 'Sign in to open the mixer';
+  subtitle.style.cssText = 'margin:0;opacity:0.75;';
+
+  const mount = document.createElement('div');
+  mount.id = 'clerk-sign-in';
+
+  root.append(title, subtitle, mount);
+  document.body.replaceChildren(root);
+  return mount;
+}
+
+/**
+ * Clerk is the security gate before the mixer UI runs.
+ * AuthService (guest/profile) stays available after sign-in.
+ */
+async function bootWithClerk() {
+  const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+  if (!publishableKey) {
+    showConfigError(
+      'Missing VITE_CLERK_PUBLISHABLE_KEY. Set it in your environment (e.g. Vercel project env or .env.local) and rebuild.',
+    );
+    return;
+  }
+
+  const clerk = new Clerk(publishableKey);
+  await clerk.load();
+  setClerkInstance(clerk);
+
+  if (clerk.isSignedIn) {
+    main();
+    return;
+  }
+
+  const mount = mountSignInShell();
+  clerk.mountSignIn(mount);
+
+  clerk.addListener(({ user }) => {
+    if (!user) return;
+    try {
+      clerk.unmountSignIn(mount);
+    } catch {
+      // ignore if already unmounted
+    }
+    document.body.replaceChildren();
+    main();
+  });
+}
+
+bootWithClerk().catch((err) => {
+  console.error(err);
+  showConfigError('Could not initialize Clerk authentication. Check the publishable key and network.');
+});
